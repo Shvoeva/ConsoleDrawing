@@ -28,7 +28,7 @@ struct Coordinates
 };
 
 
-int** ClearAll(int** image, Coordinates pointer)
+bool** ClearAll(bool** image, Coordinates pointer)
 {
 	for (int i = 0; i < height; i++)
 	{
@@ -40,13 +40,13 @@ int** ClearAll(int** image, Coordinates pointer)
 	return image;
 }
 
-int** DeletePoint(int** image, Coordinates pointer)
+bool** DeletePoint(bool** image, Coordinates pointer)
 {
 	image[pointer.y][pointer.x] = 0;
 	return image;
 }
 
-int** PaintOver(int** image, Coordinates pointer)
+bool** PaintOver(bool** image, Coordinates pointer)
 {
 	image[pointer.y][pointer.x] = 1;
 	return image;
@@ -85,7 +85,7 @@ Coordinates MovePointer(Coordinates pointer, int key)
 	return pointer;
 }
 
-void RedrawMenu(int** image, Coordinates pointer)
+void RedrawMenu(bool** image, Coordinates pointer)
 {
 	system("cls");
 
@@ -143,11 +143,11 @@ void RedrawMenu(int** image, Coordinates pointer)
 int main()
 {
 	Coordinates pointer;
-	int flag = 0;
-	int** image = new int* [height];
+	bool flag = 0;
+	bool** image = new bool* [height];
 	for (int i = 0; i < height; i++)
 	{
-		image[i] = new int[width];
+		image[i] = new bool[width];
 		for (int j = 0; j < width; j++)
 		{
 			image[i][j] = 0;
