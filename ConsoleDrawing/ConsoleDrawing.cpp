@@ -12,7 +12,7 @@ const char Dark = 178;
 const int Space = 32;
 const int AKey = 97;
 const int CKey = 99;
-const int SKey = 115;
+const int EnterKey = 13;
 const int Arrows = -32;
 
 const int ArrowUp = 72;
@@ -69,25 +69,25 @@ Coordinates MovePointer(Coordinates &pointer, int key)
 			if (pointer.Y != 0)
 			{
 				pointer.Y--;
-			};
+			}
 			break;
 		case ArrowDown:
 			if (pointer.Y != Height - 1)
 			{
 				pointer.Y++;
-			};
+			}
 			break;
 		case ArrowRight:
 			if (pointer.X != Width - 1)
 			{
 				pointer.X++;
-			};
+			}
 			break;
 		case ArrowLeft:
 			if (pointer.X != 0)
 			{
 				pointer.X--;
-			};
+			}
 			break;
 	}
 
@@ -147,7 +147,7 @@ void DisplayText()
 	cout << "\t\t\t\t\t painting - space key;" << endl;
 	cout << "\t\t\t\t\t deleting - \"C\" kay;" << endl << endl;
 	cout << "\t\t\t\t\t cleaning the canvas - \"A\" kay;" << endl;
-	cout << "\t\t\t\t\t save picture in bmp format - \"S\" kay." << endl << "\t ";
+	cout << "\t\t\t\t\t exit the program - \"Enter\" kay." << endl << "\t ";
 }
 
 void RedrawMenu(bool** image, Coordinates &pointer)
@@ -181,23 +181,26 @@ int main()
 			{
 				c2 = _getch();
 			}
-		} while (c1 != AKey && c1 != SKey && c1 != CKey && c1 != Space && c1 != Arrows);
+		} while (c1 != AKey && c1 != CKey && c1 != Space && c1 != Arrows && c1 != EnterKey);
 
 		switch (c1)
 		{
-		case Arrows:
-			pointer = MovePointer(pointer, c2);
-			break;
-		case Space:
-			image = PaintOver(image, pointer);
-			break;
-		case AKey:
-			image = ClearAll(image);
-			break;
-		case CKey:
-			image = DeletePoint(image, pointer);
-			break;
-			//case SKey: break;
+			case Arrows:
+				pointer = MovePointer(pointer, c2);
+				break;
+			case Space:
+				image = PaintOver(image, pointer);
+				break;
+			case AKey:
+				image = ClearAll(image);
+				break;
+			case CKey:
+				image = DeletePoint(image, pointer);
+				break;
+			case EnterKey:
+				flag = 1;
+				break;
+			default: break;
 		}
 	} while (flag == 0);
 
