@@ -2,18 +2,18 @@
 #include <conio.h>
 using namespace std;
 
-const int width = 64;
-const int height = 64;
+const int Width = 64;
+const int Height = 64;
 
-const int emp = 32;
-const int cur = 176;
-const int pai = 178;
+const int Light = 32;
+const int Cursor = 176;
+const int Dark = 178;
 
-const int space = 32;
-const int akey = 97;
-const int ckey = 99;
-const int skey = 115;
-const int arrows = -32;
+const int Space = 32;
+const int AKey = 97;
+const int CKey = 99;
+const int SKey = 115;
+const int Arrows = -32;
 
 const int ArrowUp = 72;
 const int ArrowDown = 80;
@@ -23,16 +23,25 @@ const int ArrowLeft = 75;
 
 struct Coordinates
 {
-	int x = 0;
-	int y = 0;
+	int X = 0;
+	int Y = 0;
 };
 
 
-bool** ClearAll(bool** image, Coordinates pointer)
+void DeleteArray(bool** image)
 {
-	for (int i = 0; i < height; i++)
+	for (int i = 0; i < Height; i++)
 	{
-		for (int j = 0; j < width; j++)
+		delete[] image[i];
+	}
+	delete[] image;
+}
+
+bool** ClearAll(bool** image)
+{
+	for (int i = 0; i < Height; i++)
+	{
+		for (int j = 0; j < Width; j++)
 		{
 			image[i][j] = 0;
 		}
@@ -40,91 +49,81 @@ bool** ClearAll(bool** image, Coordinates pointer)
 	return image;
 }
 
-bool** DeletePoint(bool** image, Coordinates pointer)
+bool** DeletePoint(bool** image, Coordinates *pointer)
 {
-	image[pointer.y][pointer.x] = 0;
+	image[pointer->Y][pointer->X] = 0;
 	return image;
 }
 
-bool** PaintOver(bool** image, Coordinates pointer)
+bool** PaintOver(bool** image, Coordinates *pointer)
 {
-	image[pointer.y][pointer.x] = 1;
+	image[pointer->Y][pointer->X] = 1;
 	return image;
 }
 
-Coordinates MovePointer(Coordinates pointer, int key)
+Coordinates MovePointer(Coordinates *pointer, int key)
 {
 	switch (key)
 	{
-	case ArrowUp:
-		if (pointer.y != 0)
-		{
-			pointer.y--;
-		}
-		break;
-	case ArrowDown:
-		if (pointer.y != height - 1)
-		{
-			pointer.y++;
-		}
-		break;
-	case ArrowRight:
-		if (pointer.x != width - 1)
-		{
-			pointer.x++;
-		}
-		break;
-	case ArrowLeft:
-		if (pointer.x != 0)
-		{
-			pointer.x--;
-		}
-		break;
+		case ArrowUp:
+			if (pointer->Y != 0)
+			{
+				pointer->Y--;
+			};
+			break;
+		case ArrowDown:
+			if (pointer->Y != Height - 1)
+			{
+				pointer->Y++;
+			};
+			break;
+		case ArrowRight:
+			if (pointer->X != Width - 1)
+			{
+				pointer->X++;
+			};
+			break;
+		case ArrowLeft:
+			if (pointer->X != 0)
+			{
+				pointer->X--;
+			};
+			break;
 	}
 
-	return pointer;
+	return *pointer;
 }
 
-void RedrawMenu(bool** image, Coordinates pointer)
+void OutputCanvas(bool** image, Coordinates *pointer)
 {
-	system("cls");
-
-	cout << endl << "\t\t\t\t\t\t\t\t__CONSOLE DRAW__" << endl;
-	cout << "\t\t\t\tCOMMANDS:" << endl;
-	cout << "\t\t\t\t\t pen move - up key, down key, left key, right key;" << endl;
-	cout << "\t\t\t\t\t painting - space key;" << endl;
-	cout << "\t\t\t\t\t deleting - \"C\" kay;" << endl << endl;
-	cout << "\t\t\t\t\t cleaning the canvas - \"A\" kay;" << endl;
-	cout << "\t\t\t\t\t save picture in bmp format - \"S\" kay." << endl << "\t ";
-
-	for (int j = 0; j < width; j++)
+	for (int j = 0; j < Width; j++)
 	{
 		cout << "__";
 	}
 	cout << endl;
 
-	for (int i = 0; i < height; i++)
+	for (int i = 0; i < Height; i++)
 	{
 		cout << "\t|";
 
-		for (int j = 0; j < width; j++)
+		for (int j = 0; j < Width; j++)
 		{
-			if (i == pointer.y && j == pointer.x)
+			if (i == pointer->Y && j == pointer->X)
 			{
-				cout << (char)cur;
-				cout << (char)cur;
+				cout << (char)Cursor;
+				cout << (char)Cursor;
 			}
 			else
 			{
 				if (image[i][j] == 1)
 				{
-					cout << (char)pai;
-					cout << (char)pai;
+					cout << (char)Dark;
+					cout << (char)Dark;
 				}
 				else
 				{
-					cout << (char)emp;
-					cout << (char)emp;
+					cout << (char)Light;
+					cout << (char)Light;
 				}
 			}
 		}
@@ -133,63 +132,76 @@ void RedrawMenu(bool** image, Coordinates pointer)
 	}
 
 	cout << "\t|";
-	for (int j = 0; j < width; j++)
+	for (int j = 0; j < Width; j++)
 	{
 		cout << "__";
 	}
 	cout << '|' << endl << endl;
 }
 
+void DisplayText()
+{
+	cout << endl << "\t\t\t\t\t\t\t\t__CONSOLE DRAW__" << endl;
+	cout << "\t\t\t\tCOMMANDS:" << endl;
+	cout << "\t\t\t\t\t pen move - up key, down key, left key, right key;" << endl;
+	cout << "\t\t\t\t\t painting - space key;" << endl;
+	cout << "\t\t\t\t\t deleting - \"C\" kay;" << endl << endl;
+	cout << "\t\t\t\t\t cleaning the canvas - \"A\" kay;" << endl;
+	cout << "\t\t\t\t\t save picture in bmp format - \"S\" kay." << endl << "\t ";
+}
+
+void RedrawMenu(bool** image, Coordinates *pointer)
+{
+	system("cls");
+	DisplayText();
+	OutputCanvas(image, pointer);
+}
+
 int main()
 {
 	Coordinates pointer;
 	bool flag = 0;
-	bool** image = new bool* [height];
-	for (int i = 0; i < height; i++)
+	bool** image = new bool* [Height];
+	for (int i = 0; i < Height; i++)
 	{
-		image[i] = new bool[width];
-		for (int j = 0; j < width; j++)
-		{
-			image[i][j] = 0;
-		}
+		image[i] = new bool[Width];
 	}
+	image = ClearAll(image);
 
 	do
 	{
-		RedrawMenu(image, pointer);
+		RedrawMenu(image, &pointer);
 
-		char c1, c2;
+		char c1;
+		char c2;
 		do
 		{
 			c1 = _getch();
-			if (c1 == arrows)
+			if (c1 == Arrows)
 			{
 				c2 = _getch();
 			}
-		} while (c1 != akey && c1 != skey && c1 != ckey && c1 != space && c1 != arrows);
+		} while (c1 != AKey && c1 != SKey && c1 != CKey && c1 != Space && c1 != Arrows);
 
 		switch (c1)
 		{
-		case arrows:
-			pointer = MovePointer(pointer, c2);
+		case Arrows:
+			pointer = MovePointer(&pointer, c2);
 			break;
-		case space:
-			image = PaintOver(image, pointer);
+		case Space:
+			image = PaintOver(image, &pointer);
 			break;
-		case akey:
-			image = ClearAll(image, pointer);
+		case AKey:
+			image = ClearAll(image);
 			break;
-		case ckey:
-			image = DeletePoint(image, pointer);
+		case CKey:
+			image = DeletePoint(image, &pointer);
 			break;
-			//case skey: break;
+			//case SKey: break;
 		}
 	} while (flag == 0);
 
-	for (int i = 0; i < height; i++)
-	{
-		delete[] image[i];
-	}
-
+	DeleteArray(image);
+	
 	return 0;
 }
