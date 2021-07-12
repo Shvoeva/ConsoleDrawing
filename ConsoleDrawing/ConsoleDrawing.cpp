@@ -5,9 +5,9 @@ using namespace std;
 const int Width = 64;
 const int Height = 64;
 
-const int Light = 32;
-const int Cursor = 176;
-const int Dark = 178;
+const char Light = 32;
+const char Cursor = 176;
+const char Dark = 178;
 
 const int Space = 32;
 const int AKey = 97;
@@ -49,52 +49,52 @@ bool** ClearAll(bool** image)
 	return image;
 }
 
-bool** DeletePoint(bool** image, Coordinates *pointer)
+bool** DeletePoint(bool** image, Coordinates &pointer)
 {
-	image[pointer->Y][pointer->X] = 0;
+	image[pointer.Y][pointer.X] = 0;
 	return image;
 }
 
-bool** PaintOver(bool** image, Coordinates *pointer)
+bool** PaintOver(bool** image, Coordinates &pointer)
 {
-	image[pointer->Y][pointer->X] = 1;
+	image[pointer.Y][pointer.X] = 1;
 	return image;
 }
 
-Coordinates MovePointer(Coordinates *pointer, int key)
+Coordinates MovePointer(Coordinates &pointer, int key)
 {
 	switch (key)
 	{
 		case ArrowUp:
-			if (pointer->Y != 0)
+			if (pointer.Y != 0)
 			{
-				pointer->Y--;
+				pointer.Y--;
 			};
 			break;
 		case ArrowDown:
-			if (pointer->Y != Height - 1)
+			if (pointer.Y != Height - 1)
 			{
-				pointer->Y++;
+				pointer.Y++;
 			};
 			break;
 		case ArrowRight:
-			if (pointer->X != Width - 1)
+			if (pointer.X != Width - 1)
 			{
-				pointer->X++;
+				pointer.X++;
 			};
 			break;
 		case ArrowLeft:
-			if (pointer->X != 0)
+			if (pointer.X != 0)
 			{
-				pointer->X--;
+				pointer.X--;
 			};
 			break;
 	}
 
-	return *pointer;
+	return pointer;
 }
 
-void OutputCanvas(bool** image, Coordinates *pointer)
+void OutputCanvas(bool** image, Coordinates &pointer)
 {
 	for (int j = 0; j < Width; j++)
 	{
@@ -108,22 +108,22 @@ void OutputCanvas(bool** image, Coordinates *pointer)
 
 		for (int j = 0; j < Width; j++)
 		{
-			if (i == pointer->Y && j == pointer->X)
+			if (i == pointer.Y && j == pointer.X)
 			{
-				cout << (char)Cursor;
-				cout << (char)Cursor;
+				cout << Cursor;
+				cout << Cursor;
 			}
 			else
 			{
 				if (image[i][j] == 1)
 				{
-					cout << (char)Dark;
-					cout << (char)Dark;
+					cout << Dark;
+					cout << Dark;
 				}
 				else
 				{
-					cout << (char)Light;
-					cout << (char)Light;
+					cout << Light;
+					cout << Light;
 				}
 			}
 		}
@@ -150,7 +150,7 @@ void DisplayText()
 	cout << "\t\t\t\t\t save picture in bmp format - \"S\" kay." << endl << "\t ";
 }
 
-void RedrawMenu(bool** image, Coordinates *pointer)
+void RedrawMenu(bool** image, Coordinates &pointer)
 {
 	system("cls");
 	DisplayText();
@@ -170,7 +170,7 @@ int main()
 
 	do
 	{
-		RedrawMenu(image, &pointer);
+		RedrawMenu(image, pointer);
 
 		char c1;
 		char c2;
@@ -186,16 +186,16 @@ int main()
 		switch (c1)
 		{
 		case Arrows:
-			pointer = MovePointer(&pointer, c2);
+			pointer = MovePointer(pointer, c2);
 			break;
 		case Space:
-			image = PaintOver(image, &pointer);
+			image = PaintOver(image, pointer);
 			break;
 		case AKey:
 			image = ClearAll(image);
 			break;
 		case CKey:
-			image = DeletePoint(image, &pointer);
+			image = DeletePoint(image, pointer);
 			break;
 			//case SKey: break;
 		}
