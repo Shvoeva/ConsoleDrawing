@@ -1,8 +1,9 @@
 #pragma warning(disable:4996)
 #include <iostream>
-#include <stdio.h>
 #include <conio.h>
 using namespace std;
+
+const char* namef = "image.bmp";
 
 const int Width = 64;
 const int Height = 64;
@@ -14,6 +15,7 @@ const char Dark = 178;
 const int Space = 32;
 const int AKey = 97;
 const int CKey = 99;
+const int SKey = 115;
 const int EnterKey = 13;
 const int Arrows = -32;
 
@@ -30,37 +32,29 @@ struct Coordinates
 };
 
 
-void SaveInBMPFormat(bool** image)
+bool SaveInBMPFormat(bool** image)
 {
 	FILE* f;
-	unsigned char* img = NULL;
-	int filesize = 54 + 3 * Width * Height;
-	//if (img)
-		//free(img);
-	img = (unsigned char*)malloc(3 * Width * Height);
-	memset(img, 0, sizeof(img));
-	int xi;
-	int yj;
-	int b;
 	
+	unsigned char *bmp = NULL;
+	bmp = (unsigned char*) malloc (3 * Width * Height);
+	memset(bmp, 0, sizeof(bmp));
 	for (int i = 0; i < Width; i++)
 	{
 		for (int j = 0; j < Height; j++)
 		{
-			xi = i;
-			yj = (Height - 1) - j;
-			b = image[i][j] * 255;
-			if (b > 255) b = 255;
-			img[(xi + yj * Width) * 3 + 2] = (unsigned char)(b);
-			img[(xi + yj * Width) * 3 + 1] = (unsigned char)(b);
-			img[(xi + yj * Width) * 3 + 0] = (unsigned char)(b);
+			unsigned char w = image[i][j] * 255;
+			bmp[(j + i * Width) * 3 + 2] = (w);
+			bmp[(j + i * Width) * 3 + 1] = (w);
+			bmp[(j + i * Width) * 3 + 0] = (w);
 		}
 	}
 
-	unsigned char bmpfileheader[14] = { 'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0 };
-	unsigned char bmpinfoheader[40] = { 40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0 };
-	unsigned char bmppad[3] = { 0,0,0 };
-
+	unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
+	unsigned char bmpinfoheader[40] = {40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0};
+	unsigned char bmppad[3] = {0,0,0};
+	int filesize = 54 + 3 * Width * Height;
+	
 	bmpfileheader[2] = (unsigned char)(filesize);
 	bmpfileheader[3] = (unsigned char)(filesize >> 8);
 	bmpfileheader[4] = (unsigned char)(filesize >> 16);
@@ -75,15 +69,17 @@ void SaveInBMPFormat(bool** image)
 	bmpinfoheader[10] = (unsigned char)(Height >> 16);
 	bmpinfoheader[11] = (unsigned char)(Height >> 24);
 
-	f = fopen("image.bmp", "wb");
+	f = fopen(namef, "wb");
 	fwrite(bmpfileheader, 1, 14, f);
 	fwrite(bmpinfoheader, 1, 40, f);
 	for (int i = 0; i < Height; i++)
 	{
-		fwrite(img + (Width * (Height - i - 1) * 3), 3, Width, f);
+		fwrite(bmp + (Width * (Height - i - 1) * 3), 3, Width, f);
 		fwrite(bmppad, 1, (4 - (Width * 3) % 4) % 4, f);
 	}
+	
 	fclose(f);
+	return 1;
 }
 
 void DeleteArray(bool** image)
@@ -148,7 +144,6 @@ Coordinates MovePointer(Coordinates &pointer, int key)
 			}
 			break;
 	}
-
 	return pointer;
 }
 
@@ -203,9 +198,11 @@ void DisplayText()
 	cout << "\t\t\t\tCOMMANDS:" << endl;
 	cout << "\t\t\t\t\t pen move - up key, down key, left key, right key;" << endl;
 	cout << "\t\t\t\t\t painting - space key;" << endl;
-	cout << "\t\t\t\t\t deleting - \"C\" kay;" << endl << endl;
-	cout << "\t\t\t\t\t cleaning the canvas - \"A\" kay;" << endl;
-	cout << "\t\t\t\t\t exit the program - \"Enter\" kay." << endl << "\t ";
+	cout << "\t\t\t\t\t deleting - \"C\" kay;" << endl;
+	cout << "\t\t\t\t\t cleaning the canvas - \"A\" kay;" << endl << endl;
+	cout << "\t\t\t\t\t exit the program and save the image in bmp format - \"S\" kay." << endl;
+	cout << "\t\t\t\t\t exit the program - \"Enter\" kay." << endl << endl << endl;
+	cout << "\t\t\t\tIn order to draw more conveniently, make the font smaller." << endl << "\t ";
 }
 
 void RedrawMenu(bool** image, Coordinates &pointer)
@@ -217,8 +214,8 @@ void RedrawMenu(bool** image, Coordinates &pointer)
 
 int main()
 {
-	Coordinates pointer;
 	bool flag = 0;
+	Coordinates pointer;
 	bool** image = new bool* [Height];
 	for (int i = 0; i < Height; i++)
 	{
@@ -239,7 +236,7 @@ int main()
 			{
 				c2 = _getch();
 			}
-		} while (c1 != AKey && c1 != CKey && c1 != Space && c1 != Arrows && c1 != EnterKey);
+		} while (c1 != AKey && c1 != CKey && c1 != SKey && c1 != Space && c1 != Arrows && c1 != EnterKey);
 
 		switch (c1)
 		{
@@ -255,6 +252,9 @@ int main()
 			case CKey:
 				image = DeletePoint(image, pointer);
 				break;
+			case SKey:
+				flag = SaveInBMPFormat(image);
+				break;
 			case EnterKey:
 				flag = 1;
 				break;
@@ -262,7 +262,6 @@ int main()
 		}
 	} while (flag == 0);
 
-	SaveInBMPFormat(image);
 	DeleteArray(image);
 	
 	return 0;
