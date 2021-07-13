@@ -1,4 +1,6 @@
+#pragma warning(disable:4996)
 #include <iostream>
+#include <stdio.h>
 #include <conio.h>
 using namespace std;
 
@@ -27,6 +29,62 @@ struct Coordinates
 	int Y = 0;
 };
 
+
+void SaveInBMPFormat(bool** image)
+{
+	FILE* f;
+	unsigned char* img = NULL;
+	int filesize = 54 + 3 * Width * Height;
+	//if (img)
+		//free(img);
+	img = (unsigned char*)malloc(3 * Width * Height);
+	memset(img, 0, sizeof(img));
+	int xi;
+	int yj;
+	int b;
+	
+	for (int i = 0; i < Width; i++)
+	{
+		for (int j = 0; j < Height; j++)
+		{
+			xi = i;
+			yj = (Height - 1) - j;
+			b = image[i][j] * 255;
+			if (b > 255) b = 255;
+			img[(xi + yj * Width) * 3 + 2] = (unsigned char)(b);
+			img[(xi + yj * Width) * 3 + 1] = (unsigned char)(b);
+			img[(xi + yj * Width) * 3 + 0] = (unsigned char)(b);
+		}
+	}
+
+	unsigned char bmpfileheader[14] = { 'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0 };
+	unsigned char bmpinfoheader[40] = { 40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 24,0 };
+	unsigned char bmppad[3] = { 0,0,0 };
+
+	bmpfileheader[2] = (unsigned char)(filesize);
+	bmpfileheader[3] = (unsigned char)(filesize >> 8);
+	bmpfileheader[4] = (unsigned char)(filesize >> 16);
+	bmpfileheader[5] = (unsigned char)(filesize >> 24);
+
+	bmpinfoheader[4] = (unsigned char)(Width);
+	bmpinfoheader[5] = (unsigned char)(Width >> 8);
+	bmpinfoheader[6] = (unsigned char)(Width >> 16);
+	bmpinfoheader[7] = (unsigned char)(Width >> 24);
+	bmpinfoheader[8] = (unsigned char)(Height);
+	bmpinfoheader[9] = (unsigned char)(Height >> 8);
+	bmpinfoheader[10] = (unsigned char)(Height >> 16);
+	bmpinfoheader[11] = (unsigned char)(Height >> 24);
+
+	f = fopen("image.bmp", "wb");
+	fwrite(bmpfileheader, 1, 14, f);
+	fwrite(bmpinfoheader, 1, 40, f);
+	for (int i = 0; i < Height; i++)
+	{
+		fwrite(img + (Width * (Height - i - 1) * 3), 3, Width, f);
+		fwrite(bmppad, 1, (4 - (Width * 3) % 4) % 4, f);
+	}
+	fclose(f);
+}
 
 void DeleteArray(bool** image)
 {
@@ -204,6 +262,7 @@ int main()
 		}
 	} while (flag == 0);
 
+	SaveInBMPFormat(image);
 	DeleteArray(image);
 	
 	return 0;
