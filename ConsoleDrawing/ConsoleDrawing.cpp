@@ -3,6 +3,7 @@
 #include <conio.h>
 using namespace std;
 
+
 const char* namef = "image.bmp";
 
 const int Width = 64;
@@ -32,12 +33,12 @@ struct Coordinates
 };
 
 
-bool SaveInBMPFormat(bool** image)
+void SaveInBMPFormat(bool** image)
 {
 	FILE* f;
 	
 	unsigned char *bmp = NULL;
-	bmp = (unsigned char*) malloc (3 * Width * Height);
+	bmp = new unsigned char [3 * Width * Height];
 	memset(bmp, 0, sizeof(bmp));
 	for (int i = 0; i < Width; i++)
 	{
@@ -70,16 +71,19 @@ bool SaveInBMPFormat(bool** image)
 	bmpinfoheader[11] = (unsigned char)(Height >> 24);
 
 	f = fopen(namef, "wb");
-	fwrite(bmpfileheader, 1, 14, f);
-	fwrite(bmpinfoheader, 1, 40, f);
-	for (int i = 0; i < Height; i++)
+	if (f != NULL)
 	{
-		fwrite(bmp + (Width * (Height - i - 1) * 3), 3, Width, f);
-		fwrite(bmppad, 1, (4 - (Width * 3) % 4) % 4, f);
+		fwrite(bmpfileheader, 1, 14, f);
+		fwrite(bmpinfoheader, 1, 40, f);
+		for (int i = 0; i < Height; i++)
+		{
+			fwrite(bmp + (Width * (Height - i - 1) * 3), 3, Width, f);
+			fwrite(bmppad, 1, (4 - (Width * 3) % 4) % 4, f);
+		}
 	}
-	
 	fclose(f);
-	return 1;
+	
+	delete[] bmp;
 }
 
 void DeleteArray(bool** image)
@@ -200,7 +204,7 @@ void DisplayText()
 	cout << "\t\t\t\t\t painting - space key;" << endl;
 	cout << "\t\t\t\t\t deleting - \"C\" kay;" << endl;
 	cout << "\t\t\t\t\t cleaning the canvas - \"A\" kay;" << endl << endl;
-	cout << "\t\t\t\t\t exit the program and save the image in bmp format - \"S\" kay." << endl;
+	cout << "\t\t\t\t\t save the image in bmp format - \"S\" kay." << endl;
 	cout << "\t\t\t\t\t exit the program - \"Enter\" kay." << endl << endl << endl;
 	cout << "\t\t\t\tIn order to draw more conveniently, make the font smaller." << endl << "\t ";
 }
@@ -214,7 +218,7 @@ void RedrawMenu(bool** image, Coordinates &pointer)
 
 int main()
 {
-	bool flag = 0;
+	bool isWorking = true;
 	Coordinates pointer;
 	bool** image = new bool* [Height];
 	for (int i = 0; i < Height; i++)
@@ -236,7 +240,8 @@ int main()
 			{
 				c2 = _getch();
 			}
-		} while (c1 != AKey && c1 != CKey && c1 != SKey && c1 != Space && c1 != Arrows && c1 != EnterKey);
+		}
+		while (c1 != AKey && c1 != CKey && c1 != SKey && c1 != Space && c1 != Arrows && c1 != EnterKey);
 
 		switch (c1)
 		{
@@ -253,14 +258,15 @@ int main()
 				image = DeletePoint(image, pointer);
 				break;
 			case SKey:
-				flag = SaveInBMPFormat(image);
+				SaveInBMPFormat(image);
 				break;
 			case EnterKey:
-				flag = 1;
+				isWorking = false;
 				break;
 			default: break;
 		}
-	} while (flag == 0);
+	}
+	while (isWorking);
 
 	DeleteArray(image);
 	
