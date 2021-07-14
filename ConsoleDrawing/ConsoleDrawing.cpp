@@ -45,9 +45,9 @@ void SaveInBMPFormat(bool** image)
 		for (int j = 0; j < Height; j++)
 		{
 			unsigned char w = image[i][j] * 255;
-			bmp[(j + i * Width) * 3 + 2] = (w);
-			bmp[(j + i * Width) * 3 + 1] = (w);
-			bmp[(j + i * Width) * 3 + 0] = (w);
+			bmp[(j + i * Width) * 3 + 2] = w;
+			bmp[(j + i * Width) * 3 + 1] = w;
+			bmp[(j + i * Width) * 3 + 0] = w;
 		}
 	}
 
@@ -101,7 +101,7 @@ bool** ClearAll(bool** image)
 	{
 		for (int j = 0; j < Width; j++)
 		{
-			image[i][j] = 0;
+			image[i][j] = false;
 		}
 	}
 	return image;
@@ -109,13 +109,13 @@ bool** ClearAll(bool** image)
 
 bool** DeletePoint(bool** image, Coordinates &pointer)
 {
-	image[pointer.Y][pointer.X] = 0;
+	image[pointer.Y][pointer.X] = false;
 	return image;
 }
 
 bool** PaintOver(bool** image, Coordinates &pointer)
 {
-	image[pointer.Y][pointer.X] = 1;
+	image[pointer.Y][pointer.X] = true;
 	return image;
 }
 
@@ -172,7 +172,7 @@ void OutputCanvas(bool** image, Coordinates &pointer)
 			}
 			else
 			{
-				if (image[i][j] == 1)
+				if (image[i][j] == true)
 				{
 					cout << Dark;
 					cout << Dark;
